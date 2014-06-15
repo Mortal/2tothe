@@ -195,10 +195,11 @@ def ai():
     while True:
         neighbors = tuple((d, move(field, d)) for d in dirs)
         neighbor_fitness = sorted(
-                tuple((n, d, fitness(n)) for d, n in neighbors if n is not None),
+                tuple((n, d, future_fitness(n, 0)) for d, n in neighbors if n is not None),
                 key=lambda a: -a[2])
         if not neighbor_fitness:
-            raise GameLost()
+            print_field(field)
+            return
         field = game.move(neighbor_fitness[0][1])
 
 def odd_moves():
