@@ -119,31 +119,74 @@ def print_field(field):
 class Game(object):
     def start(self):
         self._field = add_random_tile(add_random_tile(empty_field))
-        print_field(self._field)
+        #print_field(self._field)
         return self._field
 
     def move(self, d):
         dir_tr = {UP: 'UP', LEFT: 'LEFT', DOWN: 'DOWN', RIGHT: 'RIGHT'}
-        print(dir_tr[d])
+        #print(dir_tr[d])
         result = move(self._field, d)
         if result:
             self._field = add_random_tile(result)
-            print_field(self._field)
+            #print_field(self._field)
             return self._field
         else:
             return None
 
+def draw_field(stdscr, field, r, c, caption=''):
+    if field is None:
+        field = (0,) * (N*N)
+    for i, row in enumerate(field[j:j+N] for j in range(0, N*N, N)):
+        for j, v in enumerate(row):
+            if v == 0:
+                s = '    '
+            elif v < 10:
+                s = '%3d ' % (2 ** v)
+            else:
+                s = '^%d ' % v
+            stdscr.addstr(r + 2 * i, c + 4 * j, s)
+    stdscr.addstr(r + 2 * N, c, caption.center(4 * N))
+
+R = 2 * (N + 1)
+C = 4 * N + 2
+
 def manual():
-    game = Game()
-    field = game.start()
-    while True:
-        key_to_dir = dict(zip('wasd', (UP, LEFT, DOWN, RIGHT)))
-        dir_to_key = {k: v for v, k in key_to_dir.items()}
-        base = fitness(field)
-        future = sorted([(d, fitness(move(field, d))) for d in dirs], key=lambda o: -o[1])
-        print("  ".join("%s: %+g" % (dir_to_key[d], f - base) for d, f in future))
-        d = input().strip()
-        field = game.move(key_to_dir[d]) or field
+    stdscr = curses.initscr()
+    try:
+        curses.cbreak()
+        curses.noecho()
+        stdscr.vline(0, C-1, '|', 3*R)
+        stdscr.vline(0, 2*C-1, '|', 3*R)
+        stdscr.hline(R-1, 0, '-', 3*C)
+        stdscr.hline(2*R-1, 0, '-', 3*C)
+        game = Game()
+        field = game.start()
+        while True:
+            key_to_dir = dict(zip('wasd', (UP, LEFT, DOWN, RIGHT)))
+            dir_to_key = {k: v for v, k in key_to_dir.items()}
+            base_fitness = fitness(field)
+            draw_field(stdscr, field, 1*R, 1*C, caption=str(base_fitness))
+            future = {d: move(field, d) for d in dirs}
+            future_fitness = {d: fitness(f) if f else float('-inf') for d, f in future.items()}
+            for d, i, j in ((UP, 0, 1), (LEFT, 1, 0), (RIGHT, 1, 2), (DOWN, 2, 1)):
+                draw_field(stdscr, future[d], i*R, j*C, '%+g' % (future_fitness[d] - base_fitness))
+            d = stdscr.getkey()
+            max_fitness = sorted(future_fitness.items(), key=lambda o: -o[1])[0]
+            if d == 'q':
+                break
+            elif d == ' ':
+                field = game.move(max_fitness[0]) or field
+            else:
+                try:
+                    d = key_to_dir[d]
+                    if future_fitness[d] < max_fitness[1]:
+                        with open('odd_moves.txt', 'a') as fp:
+                            fp.write('%r\n' % [field, d, max_fitness[0], list(future_fitness.items())])
+                    field = game.move(d) or field
+                except KeyError:
+                    pass
+    finally:
+        curses.endwin()
 
 def ai():
     game = Game()
@@ -158,4 +201,4 @@ def ai():
         field = game.move(neighbor_fitness[0][1])
 
 if __name__ == '__main__':
-    ai()
+    manual()
