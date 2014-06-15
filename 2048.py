@@ -73,14 +73,14 @@ def fitness(field):
         if u1 > v < u2 or v <= 1:
             return 0
         else:
-            return 2 * 2 ** v
+            return 2 * 3 ** v
 
     def side(v):
-        return 2 ** v if v > 1 else 0
+        return 3 ** v if v > 1 else 0
 
     def neighbor(u, v):
         if u == v:
-            return 2 ** u
+            return 3 ** u
         u, v = min(u, v), max(u, v)
         if u + 1 == v and u > 3:
             return 2 ** u
