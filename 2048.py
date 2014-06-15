@@ -1,3 +1,4 @@
+import sys
 import curses
 import random
 
@@ -219,4 +220,15 @@ def odd_moves():
         print("Human chose %s (%s), but I would have chosen %s (%s)" % (dir_tr[human], future_fitness[human], dir_tr[ai], future_fitness[ai]))
 
 if __name__ == '__main__':
-    manual()
+    try:
+        mode = sys.argv[1]
+    except IndexError:
+        mode = 'help'
+    if mode == 'manual':
+        manual()
+    elif mode == 'ai':
+        ai()
+    elif mode == 'odd_moves':
+        odd_moves()
+    else:
+        print("Please specify a mode: manual, ai or odd_moves")
