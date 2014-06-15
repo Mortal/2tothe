@@ -223,10 +223,10 @@ def ai():
     field = run_ai()
     print_field(field)
 
-def aistats():
+def aistats(limit):
     next_report = 8
     stats = [0]*20
-    while True:
+    while sum(stats) < limit:
         best = max(run_ai())
         stats[best] += 1
         if sum(stats) == next_report:
@@ -261,7 +261,8 @@ if __name__ == '__main__':
     elif mode == 'ai':
         ai()
     elif mode == 'aistats':
-        aistats()
+        limit = int(sys.argv[2])
+        aistats(limit)
     elif mode == 'odd_moves':
         odd_moves()
     else:
