@@ -73,7 +73,7 @@ def fitness(field):
         if u1 > v < u2 or v <= 1:
             return 0
         else:
-            return 2 ** v
+            return 2 * 2 ** v
 
     def side(v):
         return 2 ** v if v > 1 else 0
@@ -93,6 +93,7 @@ def fitness(field):
         +sum(side(field[i]) for i in (1, 2, 4, 7, 8, 11, 13, 14))
         +sum(neighbor(field[i], field[i+1]) for j in range(0, N*N, N) for i in range(j, j+3))
         +sum(neighbor(field[i], field[i+N]) for j in range(0, N*N - N, N) for i in range(j, j+4))
+        +sum(1 for f in field if f == 0)
     )
 
 def future_fitness(field, depth):
