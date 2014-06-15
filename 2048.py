@@ -69,12 +69,12 @@ def fitness(field):
     if not field:
         return float('-inf')
     def corner(v, u1, u2):
-        if u1 > v < u2:
+        if u1 > v < u2 or v <= 1:
             return 0
         else:
-            return 4**v
+            return 3**v
     def side(v):
-        return 3**v
+        return 3**v if v > 1 else 0
     def neighbor(u, v):
         if u == v:
             return 3 ** u
@@ -83,7 +83,7 @@ def fitness(field):
             return 2 ** u
         return 0
 
-    return (sum(2**v for v in field)
+    return (sum(2**v for v in field if v > 1)
         +sum(corner(field[i1 + j1], field[i1 + j2], field[i2 + j1]) for i1, i2 in ((0, 1), (3, 2)) for j1, j2 in ((0, 4), (12, 8)))
         +sum(side(field[i]) for i in (1, 2, 4, 7, 8, 11, 13, 14))
         +sum(neighbor(field[i], field[i+1]) for j in range(0, N*N, N) for i in range(j, j+3))
