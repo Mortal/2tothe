@@ -61,7 +61,7 @@ def move(field, direction):
 def add_random_tile(field):
     result = list(field)
     i = random.choice([i for i in range(N*N) if field[i] == 0])
-    v = random.choice((1,1,1,1,2))
+    v = random.choice((1,)*9 + (2,))
     result[i] = v
     return tuple(result)
 
