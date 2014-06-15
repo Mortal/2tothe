@@ -200,5 +200,23 @@ def ai():
             raise GameLost()
         field = game.move(neighbor_fitness[0][1])
 
+def odd_moves():
+    dir_tr = {UP: 'UP', LEFT: 'LEFT', DOWN: 'DOWN', RIGHT: 'RIGHT'}
+    lines = []
+    with open('odd_moves.txt') as fp:
+        for line in fp:
+            field, human, old_ai, old_future_fitness = eval(line, {'inf': float('inf')})
+            future = {d: move(field, d) for d in dirs}
+            future_fitness = {d: fitness(f) if f else float('-inf') for d, f in future.items()}
+            ai = max(future_fitness.items(), key=lambda o: o[1])[0]
+            lines.append((field, human, ai, future_fitness))
+    lines = sorted(lines, key=lambda o: o[3][o[2]] - o[3][o[1]])
+    for line in lines:
+        field, human, ai, future_fitness = line
+        if future_fitness[ai] <= future_fitness[human]:
+            continue
+        print_field(field)
+        print("Human chose %s (%s), but I would have chosen %s (%s)" % (dir_tr[human], future_fitness[human], dir_tr[ai], future_fitness[ai]))
+
 if __name__ == '__main__':
     manual()
