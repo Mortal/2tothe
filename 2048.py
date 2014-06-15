@@ -123,6 +123,11 @@ class Game(object):
         #print_field(self._field)
         return self._field
 
+    def load(self, field):
+        self._field = tuple(field)
+        if len(self._field) != N*N:
+            raise ValueError("Field has wrong size")
+
     def move(self, d):
         dir_tr = {UP: 'UP', LEFT: 'LEFT', DOWN: 'DOWN', RIGHT: 'RIGHT'}
         #print(dir_tr[d])
@@ -153,6 +158,7 @@ C = 4 * N + 2
 
 def manual():
     stdscr = curses.initscr()
+    field = None
     try:
         curses.cbreak()
         curses.noecho()
@@ -175,6 +181,15 @@ def manual():
             max_fitness = sorted(future_fitness.items(), key=lambda o: -o[1])[0]
             if d == 'q':
                 break
+            elif d == 'l':
+                loaded_field = None
+                with open('savedstate.txt', 'rb') as fp:
+                    fp.seek(0, 2) # Seek to end
+                    fp.seek(max(0, fp.tell()-1024)) # Seek 1024 bytes before
+                    lines = fp.read().decode().splitlines()
+                    loaded_field = eval(lines[-1])
+                game.load(loaded_field)
+                field = loaded_field
             elif d == ' ':
                 field = game.move(max_fitness[0]) or field
             else:
@@ -188,6 +203,9 @@ def manual():
                     pass
     finally:
         curses.endwin()
+        if field is not None:
+            with open('savedstate.txt', 'a') as fp:
+                fp.write('%r\n' % (field,))
 
 def run_ai():
     game = Game()
