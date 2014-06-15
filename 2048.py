@@ -88,12 +88,14 @@ def fitness(field):
 
     overall_progress = sum(2**v for v in set(field))
 
+    nonzeros = sum(1 for f in field if f != 0)
+
     return (overall_progress
         +sum(corner(field[i1 + j1], field[i1 + j2], field[i2 + j1]) for i1, i2 in ((0, 1), (3, 2)) for j1, j2 in ((0, 4), (12, 8)))
         +sum(side(field[i]) for i in (1, 2, 4, 7, 8, 11, 13, 14))
         +sum(neighbor(field[i], field[i+1]) for j in range(0, N*N, N) for i in range(j, j+3))
         +sum(neighbor(field[i], field[i+N]) for j in range(0, N*N - N, N) for i in range(j, j+4))
-        +sum(1 for f in field if f == 0)
+        -nonzeros**2
     )
 
 def future_fitness(field, depth):
