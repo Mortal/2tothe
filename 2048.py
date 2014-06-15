@@ -189,7 +189,7 @@ def manual():
     finally:
         curses.endwin()
 
-def ai():
+def run_ai():
     game = Game()
     field = game.start()
     while True:
@@ -198,9 +198,12 @@ def ai():
                 tuple((n, d, future_fitness(n, 0)) for d, n in neighbors if n is not None),
                 key=lambda a: -a[2])
         if not neighbor_fitness:
-            print_field(field)
-            return
+            return field
         field = game.move(neighbor_fitness[0][1])
+
+def ai():
+    field = run_ai()
+    print_field(field)
 
 def odd_moves():
     dir_tr = {UP: 'UP', LEFT: 'LEFT', DOWN: 'DOWN', RIGHT: 'RIGHT'}
