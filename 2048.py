@@ -205,6 +205,16 @@ def ai():
     field = run_ai()
     print_field(field)
 
+def aistats():
+    next_report = 8
+    stats = [0]*20
+    while True:
+        best = max(run_ai())
+        stats[best] += 1
+        if sum(stats) == next_report:
+            print('{%s}' % ', '.join('%d: %d' % (2**i, v) for i, v in enumerate(stats) if v != 0))
+            next_report += min(32, next_report)
+
 def odd_moves():
     dir_tr = {UP: 'UP', LEFT: 'LEFT', DOWN: 'DOWN', RIGHT: 'RIGHT'}
     lines = []
@@ -232,6 +242,8 @@ if __name__ == '__main__':
         manual()
     elif mode == 'ai':
         ai()
+    elif mode == 'aistats':
+        aistats()
     elif mode == 'odd_moves':
         odd_moves()
     else:
